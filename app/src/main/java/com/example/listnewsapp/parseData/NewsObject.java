@@ -1,7 +1,5 @@
 package com.example.listnewsapp.parseData;
 
-import androidx.annotation.NonNull;
-
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -55,21 +53,51 @@ public class NewsObject {
     @Expose
     private int category;
 
-    @Override
-    public String toString() {
-        return "NewsObject{" +
-                "newId=" + newId +
-                ", name='" + name + '\'' +
-                ", image=" + image +
-                ", price=" + price +
-                ", priceWeek=" + priceWeek +
-                ", currency=" + currency +
-                ", view_count=" + view_count +
-                ", favorite=" + favorite +
-                ", emailCount=" + emailCount +
-                ", phoneCount=" + phoneCount +
-                ", owner=" + owner +
-                ", category=" + category +
-                '}';
+    public int getNewId() {
+        return newId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ImageObject getImage() {
+        return image;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public int getPriceWeek() {
+        return priceWeek;
+    }
+
+    public CurrencyObject getCurrency() {
+        return currency;
+    }
+
+    public int getView_count() {
+        return view_count;
+    }
+
+    public boolean isFavorite() {
+        return favorite;
+    }
+
+    public int getEmailCount() {
+        return emailCount;
+    }
+
+    public int getPhoneCount() {
+        return phoneCount;
+    }
+
+    public boolean isOwner() {
+        return owner;
+    }
+
+    public int getCategory() {
+        return category;
     }
 }

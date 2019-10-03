@@ -3,7 +3,6 @@ package com.example.listnewsapp.parseData;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-import java.util.Arrays;
 
 public class ResultsApi {
     @SerializedName("next")
@@ -18,12 +17,15 @@ public class ResultsApi {
     @Expose
     private NewsObject[] results;
 
-    @Override
-    public String toString() {
-        return "ResultsApi{" +
-                "urlNextPage='" + urlNextPage + '\'' +
-                ", previousPage='" + previousPage + '\'' +
-                ", results=" + Arrays.toString(results) +
-                '}';
+    public String getUrlNextPage() {
+        return urlNextPage;
+    }
+
+    public String getPreviousPage() {
+        return previousPage;
+    }
+
+    public NewsObject[] getResults() {
+        return results;
     }
 }

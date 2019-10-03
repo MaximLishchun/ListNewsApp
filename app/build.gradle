@@ -30,4 +30,14 @@ dependencies {
     implementation 'com.squareup.retrofit2:retrofit:2.4.0'
     //gson
     implementation 'com.squareup.retrofit2:converter-gson:2.3.0'
+    //retrofit
+    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    //Picasso
+    def picassoVersion = "2.71828"
+    implementation "com.squareup.picasso:picasso:$picassoVersion"
+    //cardview
+    implementation 'androidx.cardview:cardview:1.0.0'
+
+    implementation 'org.apache.commons:commons-text:1.6'
+
 }
