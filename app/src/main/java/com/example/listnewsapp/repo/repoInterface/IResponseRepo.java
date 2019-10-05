@@ -1,17 +1,18 @@
 package com.example.listnewsapp.repo.repoInterface;
 
-import com.example.listnewsapp.parseData.NewsObject;
+import com.example.listnewsapp.usingData.NewsData;
+
+import java.util.List;
 
 public interface IResponseRepo {
 
     interface ListNewsCallback {
-        void onSuccess(NewsObject[] news);
+        void onSuccess(List<NewsData> news);
     }
 
     interface ErrorCallback{
         void onError();
     }
 
-    void getListNews(String page, ListNewsCallback newsCallback, ErrorCallback errorCallback);
-    void getNewsFirstPage(ListNewsCallback newsCallback, ErrorCallback errorCallback);
+    void getAllNews(boolean needUpdate, ListNewsCallback newsCallback, ErrorCallback errorCallback);
 }

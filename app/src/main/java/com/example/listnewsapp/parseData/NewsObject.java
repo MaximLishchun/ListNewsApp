@@ -7,7 +7,7 @@ public class NewsObject {
 
     @SerializedName("id")
     @Expose
-    private int newId;
+    private int newsId;
 
     @SerializedName("name")
     @Expose
@@ -53,8 +53,8 @@ public class NewsObject {
     @Expose
     private int category;
 
-    public int getNewId() {
-        return newId;
+    public int getNewsId() {
+        return newsId;
     }
 
     public String getName() {

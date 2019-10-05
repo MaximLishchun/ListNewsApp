@@ -1,54 +1,54 @@
 package com.example.listnewsapp.repo;
 
-import com.example.listnewsapp.api.ApiService;
-import com.example.listnewsapp.parseData.ResultsApi;
-import com.example.listnewsapp.repo.repoInterface.IResponseRepo;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import com.example.listnewsapp.NewsApplication;
+import com.example.listnewsapp.repo.repoInterface.IResponseRepo;
+import com.example.listnewsapp.usingData.NewsData;
+
+import java.util.List;
 
 public class ResponseRepo implements IResponseRepo {
 
-    private static ResponseRepo mResponseRepo;
+    private static ResponseRepo mInstance;
+    private ResponseRepoApi mRepoApi;
+    private Fragment mContext;
 
-    public static ResponseRepo getInstance(){
-        if (mResponseRepo == null)
-            mResponseRepo = new ResponseRepo();
-        return mResponseRepo;
+    public static ResponseRepo getInstance(Fragment context) {
+        if(mInstance == null){
+            mInstance = new ResponseRepo(context);
+        }
+        return mInstance;
+    }
+
+    private ResponseRepo(Fragment context){
+        this.mContext = context;
+        mRepoApi = ResponseRepoApi.getInstance();
     }
 
     @Override
-    public void getListNews(String page, ListNewsCallback newsCallback, ErrorCallback errorCallback) {
+    public void getAllNews(boolean needUpdate, ListNewsCallback newsCallback, ErrorCallback errorCallback) {
+        if (needUpdate){
+            mRepoApi.getAllNews(needUpdate, newsCallback, errorCallback);
+        }else {
+            loadNewsFromDB(newsCallback, errorCallback);
+        }
     }
 
-    @Override
-    public void getNewsFirstPage(final ListNewsCallback newsCallback, final ErrorCallback errorCallback) {
-        ApiService.getInstance().getNewsResponce().getResponce().enqueue(new Callback<ResultsApi>() {
-            @Override
-            public void onResponse(Call<ResultsApi> call, Response<ResultsApi> response) {
-                if(response.isSuccessful()){
-                    if (response.body() != null){
-                        ResultsApi resultsApi = response.body();
-                        if (resultsApi.getResults() != null){
-                            newsCallback.onSuccess(resultsApi.getResults());
-                        }else {
-                            errorCallback.onError();
-                            call.cancel();
-                        }
-                    }else {
-                        errorCallback.onError();
-                        call.cancel();
-                    }
-                }else {
-                    errorCallback.onError();
-                    call.cancel();
-                }
-            }
+    private LiveData<List<NewsData>> getListNewsData(){
+        return NewsApplication.getInstance().getDatabase().getNewsDataDao().getListNewsData();
+    }
 
+    private void loadNewsFromDB(final ListNewsCallback newsCallback, final ErrorCallback errorCallback){
+        getListNewsData().observe(mContext, new Observer<List<NewsData>>() {
             @Override
-            public void onFailure(Call<ResultsApi> call, Throwable t) {
-
+            public void onChanged(List<NewsData> newsDataList) {
+                if (newsDataList != null){
+                    newsCallback.onSuccess(newsDataList);
+                }else errorCallback.onError();
             }
         });
     }

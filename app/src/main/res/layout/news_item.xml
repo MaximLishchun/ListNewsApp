@@ -15,6 +15,7 @@
             android:id="@+id/news_image"
             android:layout_width="match_parent"
             android:layout_height="300dp"
+            android:visibility="visible"
             tools:src="@color/colorPrimary" />
 
         <TextView
@@ -25,7 +26,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:textColor="@color/black_color"
-            android:textSize="35sp"
+            android:textSize="30sp"
             tools:text="News Title News Title News Title News Title News Title News Title" />
 
         <LinearLayout
@@ -37,24 +38,17 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="10dp"
-                android:text="@string/price"
+                android:text="@string/time"
                 android:textSize="20sp" />
 
             <TextView
-                android:id="@+id/price"
+                android:id="@+id/news_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingLeft="20dp"
                 android:textSize="20sp"
-
                 tools:text="800" />
 
-            <ImageView
-                android:id="@+id/image_price"
-                android:paddingLeft="20dp"
-                android:layout_height="30dp"
-                android:layout_width="50dp"
-                tools:src="@color/colorPrimary" />
         </LinearLayout>
 
     </LinearLayout>
