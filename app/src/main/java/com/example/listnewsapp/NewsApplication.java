@@ -47,4 +47,8 @@ public class NewsApplication extends Application {
         Log.i("CheckDate", "timestamp --- " + timestamp + " now --- " + now);
         return String.valueOf(DateUtils.getRelativeTimeSpanString(timestamp, now, DateUtils.MINUTE_IN_MILLIS));
     }
+
+    public Context getAppContext(){
+        return getApplicationContext();
+    }
 }

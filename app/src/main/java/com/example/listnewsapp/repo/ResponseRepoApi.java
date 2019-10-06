@@ -68,9 +68,11 @@ public class ResponseRepoApi implements IResponseRepo {
 //                    final String mydate =
 //                            java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
                     List<NewsData> newsDataList = new ArrayList<>();
+                    int firstItem = 0;
                     //add data to DB
                     for (final NewsObject newsObject : newsObjects) {
-                        final NewsData newsData = new NewsData(newsObject.getNewsId(), newsObject.getName(), newsObject.getImage().getUrl(), tsLong, newsObject.isFavorite());
+                        boolean topNews = firstItem == 0;
+                        final NewsData newsData = new NewsData(newsObject.getNewsId(), newsObject.getName(), newsObject.getImage().getUrl(), tsLong, newsObject.isFavorite(), topNews);
                         newsDataList.add(newsData);
 
                         new Thread(new Runnable() {
@@ -81,7 +83,7 @@ public class ResponseRepoApi implements IResponseRepo {
                                     dataDao.insert(newsData);
                             }
                         }).start();
-
+                        firstItem++;
                     }
 
                     newsCallback.onSuccess(newsDataList);

@@ -13,13 +13,15 @@ public class NewsData {
     private String imageUrl;
     private long loadTime;
     private boolean favorite;
+    private boolean needAddToGallery;
 
-    public NewsData(int id, String title, String imageUrl, long loadTime, boolean favorite) {
+    public NewsData(int id, String title, String imageUrl, long loadTime, boolean favorite, boolean needAddToGallery) {
         this.id = id;
         this.title = title;
         this.imageUrl = imageUrl;
         this.loadTime = loadTime;
         this.favorite = favorite;
+        this.needAddToGallery = needAddToGallery;
     }
 
     public int getId() {
@@ -40,5 +42,9 @@ public class NewsData {
 
     public boolean isFavorite() {
         return favorite;
+    }
+
+    public boolean isNeedAddToGallery(){
+        return needAddToGallery;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.listnewsapp.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,13 +19,17 @@ import com.example.listnewsapp.presenters.INewsConnection;
 import com.example.listnewsapp.presenters.NewsPresenter;
 import com.example.listnewsapp.usingData.NewsData;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class NewsFragment extends Fragment implements INewsConnection {
 
     private NewsRecyclerAdapter mAdapter;
     private NewsPresenter mPresenter;
     private boolean isLoadingData;
+    private Set<NewsData> galleryList;
 
     @Nullable
     @Override
@@ -32,6 +37,7 @@ public class NewsFragment extends Fragment implements INewsConnection {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
         mPresenter = NewsPresenter.getInstance(this, this);
         mAdapter = new NewsRecyclerAdapter();
+        galleryList = new HashSet<>();
 
         mPresenter.getNewsList(NewsApplication.getInstance().isOnline());
         isLoadingData = true;
@@ -58,7 +64,14 @@ public class NewsFragment extends Fragment implements INewsConnection {
 
     @Override
     public void onCurrentNews(List<NewsData> newsDataList) {
+        List<NewsData> galleryList = new ArrayList<>();
         mAdapter.setNewsList(newsDataList, false);
+        for (NewsData newsData : newsDataList){
+            if (newsData.isNeedAddToGallery() && !galleryList.contains(newsData)){
+                galleryList.add(newsData);
+            }
+        }
+        mAdapter.setGalleryItems(galleryList);
         isLoadingData = false;
     }
 }
