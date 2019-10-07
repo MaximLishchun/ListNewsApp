@@ -2,6 +2,7 @@ package com.example.listnewsapp.adapters;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,7 +46,9 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
         if (this.newsList.size() > 0)
             removeDuplicates(this.newsList);
-        notifyDataSetChanged();
+        if (this.newsList != null)
+            Log.i("NewsAdapter", "this.newsList " + this.newsList.size());
+        this.notifyDataSetChanged();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -56,17 +59,13 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         if (this.galleryItems.size() > 0)
             removeDuplicates(this.galleryItems);
 
-        notifyDataSetChanged();
-    }
-
-    public void clear(){
-        if (newsList != null)
-            newsList.clear();
+        this.notifyDataSetChanged();
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.i("NewsAdapter", "onCreateViewHolder " + viewType);
         if (viewType == IMAGE_GALLERY)
             return new GalleryViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.image_gallery, parent, false), parent.getContext());
@@ -77,9 +76,11 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        Log.i("NewsAdapter", "onBindViewHolder");
         if (getItemViewType(position) == NEWS_ITEM){
+            Log.i("NewsAdapter", "onBindViewHolder NEWS_ITEM");
             NewsViewHolder newsViewHolder = (NewsViewHolder) holder;
-            NewsData newsData = newsList.get(position-1);
+            NewsData newsData = newsList.get(position);
             String mainImageUrl = newsData.getImageUrl();
             if (mainImageUrl != null && !mainImageUrl.isEmpty()) {
                 newsViewHolder.newsImageView.setImageDrawable(null);
@@ -89,6 +90,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             newsViewHolder.tvNewsTitle.setText(newsData.getTitle());
             newsViewHolder.tvNewsTime.setText(NewsApplication.getInstance().convertTime(newsData.getLoadTime()));
         }else if (getItemViewType(position) == IMAGE_GALLERY){
+            Log.i("NewsAdapter", "onBindViewHolder IMAGE_GALLERY");
             GalleryViewHolder galleryViewHolder = (GalleryViewHolder) holder;
             List<ImageGalleryItem> imageGalleryItems = new ArrayList<>();
             for (NewsData newsData: galleryItems){
@@ -101,14 +103,18 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     @Override
     public int getItemCount() {
+        int size = 0;
+        if (galleryItems != null)
+            size += 1;
         if (newsList != null)
-            return newsList.size()+1;
-        else return 0;
+            size += newsList.size();
+        Log.i("NewsAdapter", "getItemCount size " + size);
+        return size;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 ? IMAGE_GALLERY : NEWS_ITEM;
+        return position == 0 && galleryItems.size() > 0 ? IMAGE_GALLERY : NEWS_ITEM;
     }
 
     class NewsViewHolder extends RecyclerView.ViewHolder{
@@ -140,22 +146,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     // Function to remove duplicates from an ArrayList
-    public static <T> List<T> removeDuplicates(List<T> list)
+    private void removeDuplicates(List<NewsData> list)
     {
-
-        // Create a new LinkedHashSet
-
-        // Add the elements to set
-        Set<T> set = new LinkedHashSet<>(list);
-
-        // Clear the list
+        Set<NewsData> set = new LinkedHashSet<>(list);
         list.clear();
-
-        // add the elements of set
-        // with no duplicates to the list
         list.addAll(set);
-
-        // return the list
-        return list;
     }
 }

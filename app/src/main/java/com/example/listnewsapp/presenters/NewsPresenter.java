@@ -1,12 +1,14 @@
 package com.example.listnewsapp.presenters;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.example.listnewsapp.repo.ResponseRepo;
-import com.example.listnewsapp.repo.repoInterface.IResponseRepo;
 import com.example.listnewsapp.usingData.NewsData;
 
-import java.util.List;
+import java.util.Comparator;
 
 public class NewsPresenter{
 
@@ -25,17 +27,13 @@ public class NewsPresenter{
         this.mResponseRepo = ResponseRepo.getInstance(context);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     public void getNewsList(boolean needUpdate) {
-        mResponseRepo.getAllNews(needUpdate, new IResponseRepo.ListNewsCallback() {
-            @Override
-            public void onSuccess(List<NewsData> news) {
-                mNewsConnection.onCurrentNews(news);
-            }
-        }, new IResponseRepo.ErrorCallback() {
-            @Override
-            public void onError() {
+        mResponseRepo.getAllNews(needUpdate, news -> {
+            news.sort(Comparator.comparing(NewsData::getId));
+            mNewsConnection.onCurrentNews(news);
+        }, () -> {
 
-            }
         });
     }
 

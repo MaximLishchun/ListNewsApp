@@ -17,7 +17,6 @@ import com.squareup.picasso.Picasso;
 
 public class ImageGalleryItem extends CardView {
 
-
     public ImageGalleryItem(Context context, NewsData newsData) {
         super(context);
 

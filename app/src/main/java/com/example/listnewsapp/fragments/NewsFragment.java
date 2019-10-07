@@ -1,7 +1,10 @@
 package com.example.listnewsapp.fragments;
 
+import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,8 +31,9 @@ public class NewsFragment extends Fragment implements INewsConnection {
 
     private NewsRecyclerAdapter mAdapter;
     private NewsPresenter mPresenter;
-    private boolean isLoadingData;
+    private RecyclerView recyclerView;
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -38,26 +42,11 @@ public class NewsFragment extends Fragment implements INewsConnection {
         mAdapter = new NewsRecyclerAdapter();
 
         mPresenter.getNewsList(NewsApplication.getInstance().isOnline());
-        isLoadingData = true;
 
-        RecyclerView recyclerView = view.findViewById(R.id.recycler_view);
+        recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(mAdapter);
-
-        return recyclerView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(!isLoadingData)
-            mPresenter.getNewsList(false);
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        mAdapter.clear();
+        return view;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
@@ -66,11 +55,10 @@ public class NewsFragment extends Fragment implements INewsConnection {
         List<NewsData> galleryList = new ArrayList<>();
         mAdapter.setNewsList(newsDataList, false);
         for (NewsData newsData : newsDataList){
-            if (newsData.isNeedAddToGallery() && !galleryList.equals(newsData)){
+            if (newsData.isNeedAddToGallery()){
                 galleryList.add(newsData);
             }
         }
         mAdapter.setGalleryItems(galleryList);
-        isLoadingData = false;
     }
 }
