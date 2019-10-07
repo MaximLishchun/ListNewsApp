@@ -6,25 +6,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
-import com.example.listnewsapp.view.ImageGalleryItem;
 import com.example.listnewsapp.NewsApplication;
 import com.example.listnewsapp.R;
 import com.example.listnewsapp.usingData.NewsData;
+import com.example.listnewsapp.view.ImageGalleryItem;
+import com.google.android.material.tabs.TabLayout;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
 
@@ -44,16 +43,19 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }else {
             this.newsList.addAll(newsList);
         }
+        if (this.newsList.size() > 0)
+            removeDuplicates(this.newsList);
         notifyDataSetChanged();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void setGalleryItems(List<NewsData>  galleryItems){
-//        if (this.galleryItems == null)
-            this.galleryItems = removeDuplicates((ArrayList<NewsData>) galleryItems);
-//        Set<NewsData> hashSet = new HashSet<NewsData>(galleryItems);
-//        this.galleryItems.clear();
-//        this.galleryItems.addAll(hashSet);
+        if (this.galleryItems == null)
+            this.galleryItems = new ArrayList<>();
+        this.galleryItems.addAll(galleryItems);
+        if (this.galleryItems.size() > 0)
+            removeDuplicates(this.galleryItems);
+
         notifyDataSetChanged();
     }
 
@@ -88,17 +90,19 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             newsViewHolder.tvNewsTime.setText(NewsApplication.getInstance().convertTime(newsData.getLoadTime()));
         }else if (getItemViewType(position) == IMAGE_GALLERY){
             GalleryViewHolder galleryViewHolder = (GalleryViewHolder) holder;
-            for (NewsData newsData: galleryItems) {
-                ImageGalleryItem imageGalleryItem = new ImageGalleryItem(NewsApplication.getInstance().getAppContext(), newsData);
-                galleryViewHolder.galleryContainer.addView(imageGalleryItem);
+            List<ImageGalleryItem> imageGalleryItems = new ArrayList<>();
+            for (NewsData newsData: galleryItems){
+                imageGalleryItems.add(new ImageGalleryItem(NewsApplication.getInstance().getAppContext(), newsData));
             }
+            galleryViewHolder.mImageViewPager.setAdapter(new GalleryPageAdapter(imageGalleryItems));
+            galleryViewHolder.tabLayout.setupWithViewPager(galleryViewHolder.mImageViewPager, true);
         }
     }
 
     @Override
     public int getItemCount() {
         if (newsList != null)
-            return newsList.size();
+            return newsList.size()+1;
         else return 0;
     }
 
@@ -122,18 +126,21 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
 
     class GalleryViewHolder extends RecyclerView.ViewHolder{
-        LinearLayout galleryContainer;
+        ViewPager mImageViewPager;
         Context parentContext;
+        TabLayout tabLayout;
 
         public GalleryViewHolder(@NonNull View itemView, Context context) {
             super(itemView);
-            galleryContainer = itemView.findViewById(R.id.gallery_container);
+            mImageViewPager = (ViewPager) itemView.findViewById(R.id.pager);
+            tabLayout = (TabLayout) itemView.findViewById(R.id.tabDots);
+
             parentContext = context;
         }
     }
 
     // Function to remove duplicates from an ArrayList
-    public static <T> ArrayList<T> removeDuplicates(ArrayList<T> list)
+    public static <T> List<T> removeDuplicates(List<T> list)
     {
 
         // Create a new LinkedHashSet

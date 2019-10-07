@@ -1,5 +1,6 @@
 package com.example.listnewsapp.usingData;
 
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
@@ -46,5 +47,20 @@ public class NewsData {
 
     public boolean isNeedAddToGallery(){
         return needAddToGallery;
+    }
+
+    @Override
+    public int hashCode() {
+        return id*title.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof NewsData)) {
+            return false;
+        }
+        NewsData newsData = (NewsData) obj;
+        return id == newsData.id && newsData.title.equals(title);
     }
 }
