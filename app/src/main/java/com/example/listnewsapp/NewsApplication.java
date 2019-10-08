@@ -5,10 +5,12 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.text.format.DateUtils;
-import android.util.Log;
 
 import androidx.room.Room;
 
+import com.example.listnewsapp.di.AppComponent;
+import com.example.listnewsapp.di.DaggerAppComponent;
+import com.example.listnewsapp.di.RepoModule;
 import com.example.listnewsapp.repo.NewsDB;
 
 import java.util.Date;
@@ -17,10 +19,12 @@ public class NewsApplication extends Application {
     public static NewsApplication instance;
 
     private NewsDB mDatabase;
+    private AppComponent appComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        initDagger();
         instance = this;
         mDatabase = Room.databaseBuilder(this, NewsDB.class, "news_database")
                 .build();
@@ -44,11 +48,20 @@ public class NewsApplication extends Application {
     //convert time to "time ago"
     public String convertTime(long timestamp){
         long now = new Date().getTime();
-        Log.i("CheckDate", "timestamp --- " + timestamp + " now --- " + now);
         return String.valueOf(DateUtils.getRelativeTimeSpanString(timestamp, now, DateUtils.MINUTE_IN_MILLIS));
     }
 
     public Context getAppContext(){
         return getApplicationContext();
+    }
+
+    private void initDagger(){
+        appComponent = DaggerAppComponent.builder()
+                .repoModule(new RepoModule())
+                .build();
+    }
+
+    public AppComponent getAppComponent(){
+        return appComponent;
     }
 }

@@ -6,6 +6,7 @@ import androidx.viewpager.widget.ViewPager;
 import android.os.Bundle;
 
 import com.example.listnewsapp.adapters.MainFragmentPagerAdapter;
+import com.example.listnewsapp.fragments.NewsFavoriteFragment;
 import com.example.listnewsapp.fragments.NewsFragment;
 import com.example.listnewsapp.fragments.NewsVideoFragment;
 import com.google.android.material.tabs.TabLayout;
@@ -33,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
         MainFragmentPagerAdapter adapter = new MainFragmentPagerAdapter(getSupportFragmentManager());
         adapter.addFragment(new NewsFragment(), getResources().getString(R.string.toolbar_title));
         adapter.addFragment(new NewsVideoFragment(), getResources().getString(R.string.videos));
-        adapter.addFragment(new NewsFragment(), getResources().getString(R.string.favorite));
+        adapter.addFragment(new NewsFavoriteFragment(), getResources().getString(R.string.favorite));
         viewPager.setOffscreenPageLimit(adapter.getCount());
         viewPager.setAdapter(adapter);
     }

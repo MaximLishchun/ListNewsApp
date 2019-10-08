@@ -16,7 +16,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.listnewsapp.NewsApplication;
 import com.example.listnewsapp.R;
 import com.example.listnewsapp.adapters.NewsRecyclerAdapter;
 import com.example.listnewsapp.presenters.INewsConnection;
@@ -26,58 +25,65 @@ import com.example.listnewsapp.usingData.NewsData;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NewsFragment extends Fragment implements INewsConnection {
+public class NewsFavoriteFragment extends Fragment implements INewsConnection {
 
     private NewsRecyclerAdapter mAdapter;
     private NewsPresenter mPresenter;
     private RecyclerView recyclerView;
     private List<NewsData> mNewsDataList;
+    private TextView tvFavoriteError;
     private ProgressBar progressBar;
     private TextView tvError;
 
-
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_news, container, false);
-
-        mPresenter = NewsPresenter.getInstance(this);
+        mPresenter = NewsPresenter.getInstanceFavorite(this);
         mAdapter = new NewsRecyclerAdapter();
-        mPresenter.getNewsList(NewsApplication.getInstance().isOnline());
 
         recyclerView = view.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(mAdapter);
 
+        tvFavoriteError = view.findViewById(R.id.favorite_error);
         progressBar = view.findViewById(R.id.progress);
         tvError = view.findViewById(R.id.tv_error);
         return view;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public void onResume() {
         super.onResume();
         mPresenter.setNewsConnectionListener(this);
+        mPresenter.getNewsList(false);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mAdapter != null)
+            mAdapter.clear();
+    }
+
     @Override
     public void onCurrentNews(List<NewsData> newsDataList, boolean isLoading) {
         if (mNewsDataList == null) {
             mNewsDataList = new ArrayList<>();
         }
-        mNewsDataList.addAll(newsDataList);
+        for (NewsData newsData : newsDataList){
+            if (newsData.isFavorite()){
+                mNewsDataList.add(newsData);
+            }
+        }
         if (!isLoading) {
             progressBar.setVisibility(View.GONE);
-            List<NewsData> galleryList = new ArrayList<>();
             mAdapter.setNewsList(mNewsDataList);
-            for (NewsData newsData : mNewsDataList) {
-                if (newsData.isNeedAddToGallery()) {
-                    galleryList.add(newsData);
-                }
+            if (mNewsDataList.size() == 0){
+                recyclerView.setVisibility(View.GONE);
+                tvFavoriteError.setVisibility(View.VISIBLE);
             }
-            mAdapter.setGalleryItems(galleryList);
         }
     }
 
@@ -87,3 +93,4 @@ public class NewsFragment extends Fragment implements INewsConnection {
         tvError.setVisibility(View.VISIBLE);
     }
 }
+

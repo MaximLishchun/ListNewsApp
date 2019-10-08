@@ -12,20 +12,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import okhttp3.HttpUrl;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ResponseRepoApi implements IResponseRepo {
-
-    private static ResponseRepoApi mResponseRepo;
-
-    public static ResponseRepoApi getInstance() {
-        if (mResponseRepo == null)
-            mResponseRepo = new ResponseRepoApi();
-        return mResponseRepo;
-    }
 
     @Override
     public void getAllNews(boolean needUpdate, final ListNewsCallback newsCallback, final ErrorCallback errorCallback) {
@@ -65,8 +59,6 @@ public class ResponseRepoApi implements IResponseRepo {
                 if (resultsApi.getResults() != null) {
                     NewsObject[] newsObjects = resultsApi.getResults();
                     long tsLong = new Date().getTime();
-//                    final String mydate =
-//                            java.text.DateFormat.getDateTimeInstance().format(Calendar.getInstance().getTime());
                     List<NewsData> newsDataList = new ArrayList<>();
                     int firstItem = 0;
                     //add data to DB
@@ -75,18 +67,15 @@ public class ResponseRepoApi implements IResponseRepo {
                         final NewsData newsData = new NewsData(newsObject.getNewsId(), newsObject.getName(), newsObject.getImage().getUrl(), tsLong, newsObject.isFavorite(), topNews);
                         newsDataList.add(newsData);
 
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                final NewsDataDao dataDao = NewsApplication.getInstance().getDatabase().getNewsDataDao();
-                                if (dataDao.getAnyNews() == null)
-                                    dataDao.insert(newsData);
-                            }
+                        new Thread(() -> {
+                            final NewsDataDao dataDao = NewsApplication.getInstance().getDatabase().getNewsDataDao();
+                            if (dataDao.getAnyNews() == null)
+                                dataDao.insert(newsData);
                         }).start();
                         firstItem++;
                     }
 
-                    newsCallback.onSuccess(newsDataList);
+                    newsCallback.onSuccess(newsDataList, (resultsApi.getUrlNextPage() != null));
                     if (resultsApi.getUrlNextPage() != null) {
                         String page = parseParameterFromUrl(resultsApi.getUrlNextPage());
                         if (page != null)

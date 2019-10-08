@@ -19,6 +19,7 @@ import com.example.listnewsapp.R;
 import com.example.listnewsapp.usingData.NewsData;
 import com.example.listnewsapp.view.ImageGalleryItem;
 import com.google.android.material.tabs.TabLayout;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -34,27 +35,20 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     private List<NewsData> newsList;
     private List<NewsData> galleryItems;
 
-    public void setNewsList(List<NewsData> newsList, boolean needCheckFavorite){
-        if (this.newsList == null)
-            this.newsList = new ArrayList<>();
-        if (needCheckFavorite){
-            for (NewsData newsData: newsList)
-                if (newsData.isFavorite())
-                    this.newsList.add(newsData);
-        }else {
-            this.newsList.addAll(newsList);
-        }
+    public NewsRecyclerAdapter(){
+        this.newsList = new ArrayList<>();
+        this.galleryItems = new ArrayList<>();
+    }
+
+    public void setNewsList(List<NewsData> newsList){
+        this.newsList.addAll(newsList);
         if (this.newsList.size() > 0)
             removeDuplicates(this.newsList);
-        if (this.newsList != null)
-            Log.i("NewsAdapter", "this.newsList " + this.newsList.size());
         this.notifyDataSetChanged();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void setGalleryItems(List<NewsData>  galleryItems){
-        if (this.galleryItems == null)
-            this.galleryItems = new ArrayList<>();
         this.galleryItems.addAll(galleryItems);
         if (this.galleryItems.size() > 0)
             removeDuplicates(this.galleryItems);
@@ -62,10 +56,14 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         this.notifyDataSetChanged();
     }
 
+    public void clear(){
+        galleryItems.clear();
+        newsList.clear();
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.i("NewsAdapter", "onCreateViewHolder " + viewType);
         if (viewType == IMAGE_GALLERY)
             return new GalleryViewHolder(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.image_gallery, parent, false), parent.getContext());
@@ -76,9 +74,7 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Log.i("NewsAdapter", "onBindViewHolder");
-        if (getItemViewType(position) == NEWS_ITEM){
-            Log.i("NewsAdapter", "onBindViewHolder NEWS_ITEM");
+        if (getItemViewType(position) == NEWS_ITEM && newsList.size() > 0){
             NewsViewHolder newsViewHolder = (NewsViewHolder) holder;
             NewsData newsData = newsList.get(position);
             String mainImageUrl = newsData.getImageUrl();
@@ -86,11 +82,10 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 newsViewHolder.newsImageView.setImageDrawable(null);
                 Picasso.get().load(mainImageUrl).into(newsViewHolder.newsImageView);
                 newsViewHolder.newsImageView.setVisibility(View.VISIBLE);
-            }
+            }else newsViewHolder.newsImageView.setVisibility(View.GONE);
             newsViewHolder.tvNewsTitle.setText(newsData.getTitle());
             newsViewHolder.tvNewsTime.setText(NewsApplication.getInstance().convertTime(newsData.getLoadTime()));
-        }else if (getItemViewType(position) == IMAGE_GALLERY){
-            Log.i("NewsAdapter", "onBindViewHolder IMAGE_GALLERY");
+        }else if (getItemViewType(position) == IMAGE_GALLERY && galleryItems.size() > 0){
             GalleryViewHolder galleryViewHolder = (GalleryViewHolder) holder;
             List<ImageGalleryItem> imageGalleryItems = new ArrayList<>();
             for (NewsData newsData: galleryItems){
@@ -104,17 +99,17 @@ public class NewsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     @Override
     public int getItemCount() {
         int size = 0;
-        if (galleryItems != null)
+        if (galleryItems.size() > 0)
             size += 1;
-        if (newsList != null)
-            size += newsList.size();
-        Log.i("NewsAdapter", "getItemCount size " + size);
+        size += newsList.size();
         return size;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == 0 && galleryItems.size() > 0 ? IMAGE_GALLERY : NEWS_ITEM;
+        if (galleryItems == null)
+            return NEWS_ITEM;
+        else return position == 0 && galleryItems.size() > 0 ? IMAGE_GALLERY : NEWS_ITEM;
     }
 
     class NewsViewHolder extends RecyclerView.ViewHolder{

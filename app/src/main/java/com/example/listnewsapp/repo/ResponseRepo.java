@@ -10,22 +10,20 @@ import com.example.listnewsapp.usingData.NewsData;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 public class ResponseRepo implements IResponseRepo {
 
-    private static ResponseRepo mInstance;
-    private ResponseRepoApi mRepoApi;
-    private Fragment mContext;
+    @Inject
+    public ResponseRepoApi mRepoApi;
+    private static Fragment mContext;
 
-    public static ResponseRepo getInstance(Fragment context) {
-        if(mInstance == null){
-            mInstance = new ResponseRepo(context);
-        }
-        return mInstance;
+    public void setContext(Fragment context) {
+        mContext = context;
     }
 
-    private ResponseRepo(Fragment context){
-        this.mContext = context;
-        mRepoApi = ResponseRepoApi.getInstance();
+    public ResponseRepo(){
+        NewsApplication.getInstance().getAppComponent().inject(this);
     }
 
     @Override
@@ -42,13 +40,12 @@ public class ResponseRepo implements IResponseRepo {
     }
 
     private void loadNewsFromDB(final ListNewsCallback newsCallback, final ErrorCallback errorCallback){
-        getListNewsData().observe(mContext, new Observer<List<NewsData>>() {
-            @Override
-            public void onChanged(List<NewsData> newsDataList) {
-                if (newsDataList != null){
-                    newsCallback.onSuccess(newsDataList);
-                }else errorCallback.onError();
-            }
-        });
+        if (mContext != null) {
+            getListNewsData().observe(mContext, newsDataList -> {
+                if (newsDataList != null) {
+                    newsCallback.onSuccess(newsDataList, false);
+                } else errorCallback.onError();
+            });
+        }
     }
 }

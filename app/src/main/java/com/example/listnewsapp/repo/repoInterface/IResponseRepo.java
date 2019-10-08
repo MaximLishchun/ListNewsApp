@@ -7,7 +7,7 @@ import java.util.List;
 public interface IResponseRepo {
 
     interface ListNewsCallback {
-        void onSuccess(List<NewsData> news);
+        void onSuccess(List<NewsData> news, boolean isLoading);
     }
 
     interface ErrorCallback{

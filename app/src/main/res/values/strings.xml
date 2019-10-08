@@ -5,4 +5,6 @@
     <string name="videos_is_empty">There are no news videos</string>
     <string name="videos">Videos</string>
     <string name="favorite">Favorite</string>
+    <string name="favorite_is_empty">No favorite news</string>
+    <string name="error_message">Error. \nNews not loaded. \n Check your internet connection and restart app.</string>
 </resources>
